@@ -1,8 +1,5 @@
 import React from 'react';
 
-
-
-
 const Zar1: React.FC = () => {
   return (
     <div className="grid grid-nogutter w-2rem h-2rem border-2 bg-green-100">

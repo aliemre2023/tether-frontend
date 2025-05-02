@@ -5,16 +5,15 @@ const Game = () => {
 
     return (
         <div className='flex w-12 h-screen justify-content-center align-items-center bg-blue-300'>
-            <div className='w-12'>
-                <div>
-                    <div>1</div>
-                    <div>2</div>
-                    <div>3</div>
-                    <div>4</div>
-                    <div>5</div>
-                    <div>6</div>
+            <div className="w-12 flex justify-content-center align-items-center">
+                <div className="ml-4 mr-4 w-8 bg-blue-400 border-round-xl pb-1 shadow-3">
+                    <div className="m-0 flex align-items-center justify-content-center h-8rem text-white"> Market Stok </div>
+                    <div className="m-4 bg-red-700 flex border-round-xl align-items-center justify-content-center h-8rem shadow-3" >1</div>
+                    <div className="m-4 bg-red-700 flex border-round-xl align-items-center justify-content-center h-8rem shadow-3" >1</div>
+                    <div className="m-4 bg-red-700 flex border-round-xl align-items-center justify-content-center h-8rem shadow-3" >1</div>
                 </div>
-            </div> 
+            </div>
+
             <div className='w-40rem h-36rem bg-red-300 flex'>
 
                     <div className='w-6 bg-red-400 mr-1'>

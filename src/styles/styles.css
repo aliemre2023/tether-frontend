@@ -1,28 +1,30 @@
 .w-135rem {
     width: 135rem;
 }
+
 .h-40rem {
     height: 40rem;
 }
+
 .h-36rem {
     height: 36rem;
 }
-.triangle-bottom{
+
+.triangle-bottom {
     width: 0;
     height: 0;
     border-left: 1.4rem solid transparent;
-    border-right: 1.4rem  solid transparent;
+    border-right: 1.4rem solid transparent;
     border-bottom: 17.5rem solid #3498db;
     z-index: 0;
     position: absolute;
-    
-    
 }
-.triangle-top{
+
+.triangle-top {
     width: 0;
     height: 0;
     border-left: 1.4rem solid transparent;
-    border-right: 1.4rem  solid transparent;
+    border-right: 1.4rem solid transparent;
     border-top: 17.5rem solid #3498db;
     z-index: 0;
     position: absolute;

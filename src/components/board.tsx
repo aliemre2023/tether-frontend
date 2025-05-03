@@ -9,6 +9,7 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
   const [board, setBoard] = useState<string[][]>([]);
   const [highlightedTriangles, setHighlightedTriangles] = useState<number[]>([]);
   const [selectedTriangle, setSelectedTriangle] = useState<number | null>(null);
+  const [brokenPiece, setBrokenPiece] = useState<number[]>([0,0]); // white, black
 
   // Reset board on mount
   useEffect(() => {
@@ -50,7 +51,10 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
       .then(res => res.json())
       .then(boardData => {
         // Set the new board state here
+        console.log("boardData.board: ", boardData.board);
         setBoard(boardData.board || []);
+        console.log("boardData.broken:", boardData.broken);
+        setBrokenPiece(boardData.broken || [0,0]);
       })
       .catch(err => console.error('Error reloading board:', err));
   };
@@ -126,25 +130,49 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
   const rightTop = board.slice(18, 24);
 
   return (
-    <div className='w-135rem h-auto bg-red-700 flex p-4 border-round-xl'>
-      <div className='w-6 bg-red-400 mr-1'>
-        <div className='flex bg-green-100 h-18rem'>
-          {leftTop.map((stack, i) => renderTriangle(i + 12, stack, 'top'))}
-        </div>
-        <div className='flex bg-green-100 h-18rem'>
-          {leftBottom.map((stack, i) => renderTriangle(i + 6, stack, 'bottom'))}
-        </div>
-      </div>
+    <div className='w-135rem h-auto'>
+        <div className='bg-red-700 flex p-4 border-round-xl'>
+            <div className='w-6 bg-red-400 mr-1'>
+                <div className='flex bg-green-100 h-18rem'>
+                {leftTop.map((stack, i) => renderTriangle(i + 12, stack, 'top'))}
+                </div>
+                <div className='flex bg-green-100 h-18rem'>
+                {leftBottom.map((stack, i) => renderTriangle(i + 6, stack, 'bottom'))}
+                </div>
+            </div>
 
-      <div className='w-6 bg-red-400 ml-1'>
-        <div className='flex bg-green-100 h-18rem'>
-          {rightTop.map((stack, i) => renderTriangle(i + 18, stack, 'top'))}
+            <div className='w-6 bg-red-400 ml-1'>
+                <div className='flex bg-green-100 h-18rem'>
+                {rightTop.map((stack, i) => renderTriangle(i + 18, stack, 'top'))}
+                </div>
+                <div className='flex bg-green-100 h-18rem'>
+                {rightBottom.map((stack, i) => renderTriangle(i, stack, 'bottom'))}
+                </div>
+            </div>
         </div>
-        <div className='flex bg-green-100 h-18rem'>
-          {rightBottom.map((stack, i) => renderTriangle(i, stack, 'bottom'))}
+        <div className='flex w-12'>
+            {/* White broken pieces container */}
+            <div className=' w-6 flex bg-red-700 p-1 mt-1 border-round-md mr-1'>
+                {Array.from({ length: brokenPiece[0] }).map((_, i) => (
+                <div
+                    key={`white-${i}`}
+                    className='piece bg-white border border-gray-700 m-1'
+                ></div>
+                ))}
+            </div>
+
+            {/* Black broken pieces container */}
+            <div className='pieces-container w-6 flex bg-red-700 p-1 mt-1 border-round-md justify-end ml-1'>
+                {Array.from({ length: brokenPiece[1] }).map((_, i) => (
+                <div
+                    key={`black-${i}`}
+                    className='piece bg-black border border-gray-700 m-1'
+                ></div>
+                ))}
+            </div>
         </div>
-      </div>
     </div>
+
   );
 };
 

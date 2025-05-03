@@ -17,6 +17,8 @@ const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2 }) => {
     const [dices1, setDices1] = useState<number[]>(Array(6).fill(0));
     const [dices2, setDices2] = useState<number[]>(Array(6).fill(0));
 
+    const diceComponents = [Zar1, Zar2, Zar3, Zar4, Zar5, Zar6];
+
     return (
         <div className="w-12 flex justify-content-center">
             <div>
@@ -24,106 +26,36 @@ const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2 }) => {
                     className={`flex gap-4 p-4 ${dice1 ? 'bg-red-800' : 'bg-red-700'} m-1 border-round-xl shadow-3`}
                     style={{ width: 'max-content' }}
                 >
-                    {/* Dice 1 */}
-                    <div
-                        onClick={() => setDice1(1)}
-                        className={`cursor-pointer ${dices1[0] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar1 isSelected={dice1 === 1} />
-                    </div>
-
-                    {/* Dice 2 */}
-                    <div
-                        onClick={() => setDice1(2)}
-                        className={`cursor-pointer ${dices1[1] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar2 isSelected={dice1 === 2} />
-                    </div>
-
-                    {/* Dice 3 */}
-                    <div
-                        onClick={() => setDice1(3)}
-                        className={`cursor-pointer ${dices1[2] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar3 isSelected={dice1 === 3} />
-                    </div>
-
-                    {/* Dice 4 */}
-                    <div
-                        onClick={() => setDice1(4)}
-                        className={`cursor-pointer ${dices1[3] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar4 isSelected={dice1 === 4} />
-                    </div>
-
-                    {/* Dice 5 */}
-                    <div
-                        onClick={() => setDice1(5)}
-                        className={`cursor-pointer ${dices1[4] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar5 isSelected={dice1 === 5} />
-                    </div>
-
-                    {/* Dice 6 */}
-                    <div
-                        onClick={() => setDice1(6)}
-                        className={`cursor-pointer ${dices1[5] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar6 isSelected={dice1 === 6} />
-                    </div>
+                    {diceComponents.map((ZarComponent, index) => (
+                        <div
+                            key={index}
+                            onClick={() => {
+                                setDice1(dice1 === index + 1 ? 0 : index + 1);
+                            }}
+                            className={`cursor-pointer ${dices1[index] ? 'bg-red-300' : 'bg-green-100'}`}
+                        >
+                            {' '}
+                            <ZarComponent isSelected={dice1 === index + 1} />{' '}
+                        </div>
+                    ))}
                 </div>
 
                 <div
                     className={`flex gap-4 p-4 ${dice2 ? 'bg-red-800' : 'bg-red-700'} m-1 border-round-xl shadow-3`}
                     style={{ width: 'max-content' }}
                 >
-                    {/* Dice 1 */}
-                    <div
-                        onClick={() => setDice2(1)}
-                        className={`cursor-pointer ${dices2[0] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar1 isSelected={dice2 === 1} />
-                    </div>
-
-                    {/* Dice 2 */}
-                    <div
-                        onClick={() => setDice2(2)}
-                        className={`cursor-pointer ${dices2[1] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar2 isSelected={dice2 === 2} />
-                    </div>
-
-                    {/* Dice 3 */}
-                    <div
-                        onClick={() => setDice2(3)}
-                        className={`cursor-pointer ${dices2[2] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar3 isSelected={dice2 === 3} />
-                    </div>
-
-                    {/* Dice 4 */}
-                    <div
-                        onClick={() => setDice2(4)}
-                        className={`cursor-pointer ${dices2[3] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar4 isSelected={dice2 === 4} />
-                    </div>
-
-                    {/* Dice 5 */}
-                    <div
-                        onClick={() => setDice2(5)}
-                        className={`cursor-pointer ${dices2[4] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar5 isSelected={dice2 === 5} />
-                    </div>
-
-                    {/* Dice 6 */}
-                    <div
-                        onClick={() => setDice2(6)}
-                        className={`cursor-pointer ${dices2[5] ? 'bg-red-300' : 'bg-green-100'}`}
-                    >
-                        <Zar6 isSelected={dice2 === 6} />
-                    </div>
+                    {diceComponents.map((ZarComponent, index) => (
+                        <div
+                            key={index}
+                            onClick={() => {
+                                setDice2(dice2 === index + 1 ? 0 : index + 1);
+                            }}
+                            className={`cursor-pointer ${dices2[index] ? 'bg-red-300' : 'bg-green-100'}`}
+                        >
+                            {' '}
+                            <ZarComponent isSelected={dice2 === index + 1} />{' '}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

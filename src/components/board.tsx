@@ -45,15 +45,56 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
       .catch(err => console.error('Error getting possible moves:', err));
   };
 
+  const reloadBoard = () => {
+    fetch('http://127.0.0.1:5000/api/board/reload')
+      .then(res => res.json())
+      .then(boardData => {
+        // Set the new board state here
+        setBoard(boardData.board || []);
+      })
+      .catch(err => console.error('Error reloading board:', err));
+  };
+
   const handleTriangleClick = (index: number) => {
     if (dice1 == null || dice2 == null) {
       console.warn('Dice values are not set');
       return;
     }
-
-    setSelectedTriangle(index);
-    fetchMoves(index, dice1, dice2);
+  
+    const isHighYellow = highlightedTriangles.includes(index);
+  
+    if (selectedTriangle === index) {
+      setSelectedTriangle(null);
+      setHighlightedTriangles([]);
+      return;
+    } else if (isHighYellow) {
+      const clickedYellow = highlightedTriangles.includes(index);
+  
+      fetch('http://127.0.0.1:5000/api/moveTo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index_from: selectedTriangle, index_to: index })
+      })
+        .then(res => res.json())
+        .then(data => {
+          const transformedMoves = (data.moves || []).map((triangleId: number) => {
+            if (triangleId <= 5) return 5 - triangleId;
+            if (triangleId > 5 && triangleId <= 11) return 11 - triangleId + 6;
+            return triangleId;
+          });
+          setHighlightedTriangles([]);
+          setSelectedTriangle(null);
+  
+          // Only reload board after move is complete
+          reloadBoard();
+        })
+        .catch(err => console.error('Error moving piece:', err));
+    } else {
+      setSelectedTriangle(index);
+      fetchMoves(index, dice1, dice2);
+    }
   };
+  
 
   const renderTriangle = (index: number, stack: any, direction: 'top' | 'bottom') => {
     const safeStack = Array.isArray(stack) ? stack : [];

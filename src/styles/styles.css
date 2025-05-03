@@ -39,3 +39,9 @@
     position: relative;
     z-index: 1;
 }
+
+.disabled-dice {
+    filter: grayscale(100%);
+    pointer-events: none !important;
+    opacity: 0.5;
+}

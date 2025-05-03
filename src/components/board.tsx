@@ -1,3 +1,4 @@
+import { accumulateViewport } from 'next/dist/lib/metadata/resolve-metadata';
 import React, { useEffect, useState } from 'react';
 
 interface BoardProps {
@@ -5,9 +6,38 @@ interface BoardProps {
     diceTop2: number | null;
     diceBottom1: number | null;
     diceBottom2: number | null;
+    setDiceTop1: (value: number) => void;
+    setDiceTop2: (value: number) => void;
+    setDiceBottom1: (value: number) => void;
+    setDiceBottom2: (value: number) => void;
+    availableTopDices1: Array<boolean>;
+    availableTopDices2: Array<boolean>;
+    availableBottomDices1: Array<boolean>;
+    availableBottomDices2: Array<boolean>;
+    setAvailableTopDices1: (value: Array<boolean>) => void;
+    setAvailableTopDices2: (value: Array<boolean>) => void;
+    setAvailableBottomDices1: (value: Array<boolean>) => void;
+    setAvailableBottomDices2: (value: Array<boolean>) => void;
 }
 
-const Board: React.FC<BoardProps> = ({ diceTop1, diceTop2, diceBottom1, diceBottom2 }) => {
+const Board: React.FC<BoardProps> = ({
+    diceTop1,
+    diceTop2,
+    diceBottom1,
+    diceBottom2,
+    setDiceTop1,
+    setDiceTop2,
+    setDiceBottom1,
+    setDiceBottom2,
+    availableTopDices1,
+    availableTopDices2,
+    availableBottomDices1,
+    availableBottomDices2,
+    setAvailableTopDices1,
+    setAvailableTopDices2,
+    setAvailableBottomDices1,
+    setAvailableBottomDices2,
+}) => {
     const [currentPlayer, setCurrentPlayer] = useState<string>('white');
     const [board, setBoard] = useState<string[][]>([]);
     const [highlightedTriangles, setHighlightedTriangles] = useState<number[]>([]);
@@ -35,6 +65,24 @@ const Board: React.FC<BoardProps> = ({ diceTop1, diceTop2, diceBottom1, diceBott
             }
         }
     }, [selectedTriangle, diceTop1, diceTop2, diceBottom1, diceBottom2, currentPlayer]);
+
+    useEffect(() => {
+        let isDiceReload = true;
+        let merged = [...availableTopDices1, ...availableBottomDices1];
+        for (let i = 0; i < merged.length; i++) {
+            if (merged[i]) {
+                isDiceReload = false;
+                break;
+            }
+        }
+        if (isDiceReload) {
+            console.log('eee aga reload atsana');
+            setAvailableTopDices1(Array(6).fill(true));
+            setAvailableTopDices2(Array(6).fill(true));
+            setAvailableBottomDices1(Array(6).fill(true));
+            setAvailableBottomDices2(Array(6).fill(true));
+        }
+    }, [availableTopDices1, availableBottomDices1]);
 
     const fetchMoves = (index: number, d1: number, d2: number) => {
         fetch('http://127.0.0.1:5000/api/move', {
@@ -98,6 +146,47 @@ const Board: React.FC<BoardProps> = ({ diceTop1, diceTop2, diceBottom1, diceBott
                         if (triangleId > 5 && triangleId <= 11) return 11 - triangleId + 6;
                         return triangleId;
                     });
+
+                    if (currentPlayer == 'white') {
+                        setDiceTop1(0);
+                        setDiceTop2(0);
+                        setAvailableTopDices1(
+                            availableTopDices1.map((dice, index) => {
+                                if (index == dice1 - 1) {
+                                    return false;
+                                }
+                                return dice;
+                            })
+                        );
+                        setAvailableTopDices2(
+                            availableTopDices2.map((dice, index) => {
+                                if (index == dice2 - 1) {
+                                    return false;
+                                }
+                                return dice;
+                            })
+                        );
+                    } else {
+                        setDiceBottom1(0);
+                        setDiceBottom2(0);
+                        setAvailableBottomDices1(
+                            availableBottomDices1.map((dice, index) => {
+                                if (index == dice1 - 1) {
+                                    return false;
+                                }
+                                return dice;
+                            })
+                        );
+                        setAvailableBottomDices2(
+                            availableBottomDices2.map((dice, index) => {
+                                if (index == dice2 - 1) {
+                                    return false;
+                                }
+                                return dice;
+                            })
+                        );
+                    }
+
                     setHighlightedTriangles([]);
                     setSelectedTriangle(null);
 

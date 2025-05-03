@@ -1,10 +1,12 @@
 import React from 'react';
 
-const Zar4: React.FC<ZarProps> = ({ isSelected }) => {
+const Zar4: React.FC<ZarProps> = ({ isSelected, isAvailable }) => {
     let bgClass = 'bg-green-100';
 
     if (isSelected) {
         bgClass = 'bg-green-700';
+    } else if (!isAvailable) {
+        bgClass = 'bg-green-100 disabled-dice';
     }
 
     return (

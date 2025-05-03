@@ -11,10 +11,12 @@ interface DiceProps {
     dice2: number;
     setDice1: (value: number) => void;
     setDice2: (value: number) => void;
+    availableDices1: Array<boolean>;
+    availableDices2: Array<boolean>;
     style: string;
 }
 
-const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, style }) => {
+const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, availableDices1, availableDices2, style }) => {
     const [dices1, setDices1] = useState<number[]>(Array(6).fill(0));
     const [dices2, setDices2] = useState<number[]>(Array(6).fill(0));
 
@@ -31,12 +33,14 @@ const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, style }) 
                         <div
                             key={index}
                             onClick={() => {
-                                setDice1(dice1 === index + 1 ? 0 : index + 1);
+                                if (availableDices1[index]) {
+                                    setDice1(dice1 === index + 1 ? 0 : index + 1);
+                                }
                             }}
                             className={`cursor-pointer ${dices1[index] ? 'bg-red-300' : 'bg-green-100'}`}
                         >
                             {' '}
-                            <ZarComponent isSelected={dice1 === index + 1} />{' '}
+                            <ZarComponent isSelected={dice1 === index + 1} isAvailable={availableDices1[index]} />{' '}
                         </div>
                     ))}
                 </div>
@@ -49,12 +53,14 @@ const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, style }) 
                         <div
                             key={index}
                             onClick={() => {
-                                setDice2(dice2 === index + 1 ? 0 : index + 1);
+                                if (availableDices2[index]) {
+                                    setDice2(dice2 === index + 1 ? 0 : index + 1);
+                                }
                             }}
                             className={`cursor-pointer ${dices2[index] ? 'bg-red-300' : 'bg-green-100'}`}
                         >
                             {' '}
-                            <ZarComponent isSelected={dice2 === index + 1} />{' '}
+                            <ZarComponent isSelected={dice2 === index + 1} isAvailable={availableDices2[index]} />{' '}
                         </div>
                     ))}
                 </div>

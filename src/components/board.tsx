@@ -104,12 +104,11 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
     return (
       <div
         key={index}
-        className={`flex justify-content-center w-2 cursor-pointer ${isHighlighted ? 'bg-yellow-400' : ''} ${selectedTriangle === index ? 'bg-green-400' : ''}`}
+        className={`flex justify-content-center w-2 cursor-pointer ${isHighlighted ? 'bg-yellow-400' : ''} ${selectedTriangle === index ? 'bg-green-400' : ''} ${direction === 'top' ? '' : 'align-items-end'}`}
         onClick={() => handleTriangleClick(index)}
       >
         <div className={triangleClasses}></div>
-        <div className={`${direction === 'top' ? '' : 'pieces-container'}`}>
-
+        <div>
           {safeStack.map((piece, i) => (
             <div
               key={i}

@@ -8,55 +8,55 @@ interface BoardProps {
 const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
   const [board, setBoard] = useState<string[][]>([]);
   const [highlightedTriangles, setHighlightedTriangles] = useState<number[]>([]);
+  const [selectedTriangle, setSelectedTriangle] = useState<number | null>(null);
 
+  // Reset board on mount
   useEffect(() => {
     fetch('http://127.0.0.1:5000/api/reset')
       .then(res => res.json())
       .then(data => {
-        console.log('Reset board:', data.board);
-        setBoard(data.board);
+        setBoard(data.board || []);
       })
       .catch(err => console.error('Error resetting board:', err));
   }, []);
+
+  // Refetch moves when dice values change
+  useEffect(() => {
+    if (selectedTriangle !== null && dice1 !== null && dice2 !== null) {
+      fetchMoves(selectedTriangle, dice1, dice2);
+    }
+  }, [dice1, dice2]);
+
+  const fetchMoves = (index: number, d1: number, d2: number) => {
+    fetch('http://127.0.0.1:5000/api/move', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, dice1: d1, dice2: d2 })
+    })
+      .then(res => res.json())
+      .then(data => {
+        const transformedMoves = (data.moves || []).map((triangleId: number) => {
+          if (triangleId <= 5) return 5 - triangleId;
+          if (triangleId > 5 && triangleId <= 11) return 11 - triangleId + 6;
+          return triangleId;
+        });
+        setHighlightedTriangles(transformedMoves);
+      })
+      .catch(err => console.error('Error getting possible moves:', err));
+  };
 
   const handleTriangleClick = (index: number) => {
     if (dice1 == null || dice2 == null) {
       console.warn('Dice values are not set');
       return;
     }
-  
-    console.log(dice1);
-    console.log(dice2);
-    console.log(index);
-  
-    fetch('http://localhost:5000/api/move', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index, dice1, dice2 })
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log('Possible moves:', data.possibleMoves);
-  
-        const transformedMoves = data.moves.map((triangleId: number) => {
-          if (triangleId <= 5) {
-            return 5 - triangleId;
-          } else if (triangleId > 5 && triangleId <= 11) {
-            return 11 - triangleId + 6;
-          } else {
-            return triangleId;
-          }
-        });
-  
-        setHighlightedTriangles(transformedMoves);
-      })
-      .catch(err => console.error('Error getting possible moves:', err));
+
+    setSelectedTriangle(index);
+    fetchMoves(index, dice1, dice2);
   };
-  
 
   const renderTriangle = (index: number, stack: any, direction: 'top' | 'bottom') => {
     const safeStack = Array.isArray(stack) ? stack : [];
-
     const isHighlighted = highlightedTriangles.includes(index);
     const triangleClasses = `triangle-${direction} m-1 ${isHighlighted ? 'bg-yellow-400' : ''}`;
 
@@ -103,7 +103,6 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
           {rightBottom.map((stack, i) => renderTriangle(i, stack, 'bottom'))}
         </div>
       </div>
-
     </div>
   );
 };

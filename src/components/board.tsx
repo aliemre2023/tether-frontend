@@ -10,7 +10,7 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
   const [highlightedTriangles, setHighlightedTriangles] = useState<number[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/reset')
+    fetch('http://127.0.0.1:5000/api/reset')
       .then(res => res.json())
       .then(data => {
         console.log('Reset board:', data.board);
@@ -85,7 +85,7 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
   const rightTop = board.slice(18, 24);
 
   return (
-    <div className='w-135rem h-36rem bg-red-300 flex'>
+    <div className='w-135rem h-auto bg-red-700 flex p-4 border-round-xl'>
       <div className='w-6 bg-red-400 mr-1'>
         <div className='flex bg-green-100 h-18rem'>
           {leftTop.map((stack, i) => renderTriangle(i + 12, stack, 'top'))}
@@ -103,6 +103,7 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
           {rightBottom.map((stack, i) => renderTriangle(i, stack, 'bottom'))}
         </div>
       </div>
+
     </div>
   );
 };

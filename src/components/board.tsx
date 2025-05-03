@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-const Board: React.FC = () => {
+interface BoardProps {
+  dice1: number | null;
+  dice2: number | null;
+}
+
+const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
   const [board, setBoard] = useState<string[][]>([]);
+  const [highlightedTriangles, setHighlightedTriangles] = useState<number[]>([]);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/reset')
@@ -13,16 +19,55 @@ const Board: React.FC = () => {
       .catch(err => console.error('Error resetting board:', err));
   }, []);
 
-
+  const handleTriangleClick = (index: number) => {
+    if (dice1 == null || dice2 == null) {
+      console.warn('Dice values are not set');
+      return;
+    }
+  
+    console.log(dice1);
+    console.log(dice2);
+    console.log(index);
+  
+    fetch('http://localhost:5000/api/move', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, dice1, dice2 })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('Possible moves:', data.possibleMoves);
+  
+        const transformedMoves = data.moves.map((triangleId: number) => {
+          if (triangleId <= 5) {
+            return 5 - triangleId;
+          } else if (triangleId > 5 && triangleId <= 11) {
+            return 11 - triangleId + 6;
+          } else {
+            return triangleId;
+          }
+        });
+  
+        setHighlightedTriangles(transformedMoves);
+      })
+      .catch(err => console.error('Error getting possible moves:', err));
+  };
+  
 
   const renderTriangle = (index: number, stack: any, direction: 'top' | 'bottom') => {
     const safeStack = Array.isArray(stack) ? stack : [];
 
-    if (direction === 'top') {
-      return (
-        <div key={index} className='w-2'>
-          <div className={`triangle-${direction} m-1`}></div>
-          {/* Directly render individual pieces without a container */}
+    const isHighlighted = highlightedTriangles.includes(index);
+    const triangleClasses = `triangle-${direction} m-1 ${isHighlighted ? 'bg-yellow-400' : ''}`;
+
+    return (
+      <div
+        key={index}
+        className='w-2 cursor-pointer'
+        onClick={() => handleTriangleClick(index)}
+      >
+        <div className={triangleClasses}></div>
+        <div className={direction === 'top' ? '' : 'pieces-container'}>
           {safeStack.map((piece, i) => (
             <div
               key={i}
@@ -30,41 +75,20 @@ const Board: React.FC = () => {
             ></div>
           ))}
         </div>
-      );
-    } else {
-      return (
-        <div key={index} className='w-2'>
-          <div className={`triangle-${direction} m-1`}></div>
-          <div className='pieces-container'>
-            {safeStack.map((piece, i) => (
-              <div
-                key={i}
-                className={`piece ${piece === 'white' ? 'bg-white' : 'bg-black'} border border-gray-700`}
-              ></div>
-            ))}
-          </div>
-        </div>
-      );
-    }
+      </div>
+    );
   };
 
-  // Right Bottom (0,5 from right to left)
   const rightBottom = board.slice(0, 6).reverse();
-
-  // Left Bottom (6,11 from right to left)
   const leftBottom = board.slice(6, 12).reverse();
-
-  // Left Top (12,17 from left to right)
   const leftTop = board.slice(12, 18);
-
-  // Right Top (18,23 from left to right)
   const rightTop = board.slice(18, 24);
 
   return (
     <div className='w-135rem h-36rem bg-red-300 flex'>
       <div className='w-6 bg-red-400 mr-1'>
         <div className='flex bg-green-100 h-18rem'>
-          {leftTop.map((stack, i) => renderTriangle(i, stack, 'top'))}
+          {leftTop.map((stack, i) => renderTriangle(i + 12, stack, 'top'))}
         </div>
         <div className='flex bg-green-100 h-18rem'>
           {leftBottom.map((stack, i) => renderTriangle(i + 6, stack, 'bottom'))}
@@ -73,10 +97,10 @@ const Board: React.FC = () => {
 
       <div className='w-6 bg-red-400 ml-1'>
         <div className='flex bg-green-100 h-18rem'>
-          {rightTop.map((stack, i) => renderTriangle(i + 12, stack, 'top'))}
+          {rightTop.map((stack, i) => renderTriangle(i + 18, stack, 'top'))}
         </div>
         <div className='flex bg-green-100 h-18rem'>
-          {rightBottom.map((stack, i) => renderTriangle(i + 18, stack, 'bottom'))}
+          {rightBottom.map((stack, i) => renderTriangle(i, stack, 'bottom'))}
         </div>
       </div>
     </div>

@@ -1,13 +1,11 @@
 import React from 'react';
 
-const Zar4: React.FC<ZarProps> = ({ isSelected, isUsed }) => {
+const Zar4: React.FC<ZarProps> = ({ isSelected}) => {
     let bgClass = 'bg-green-100';
   
-    if (isUsed) {
-      bgClass = 'bg-red-300';
-    } else if (isSelected) {
+    if (isSelected) {
       bgClass = 'bg-green-700';
-    }
+    } 
   
     return (
       <div className={`grid grid-nogutter w-2rem h-2rem border-2 ${bgClass}`}>

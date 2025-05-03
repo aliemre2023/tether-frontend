@@ -58,20 +58,21 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
   const renderTriangle = (index: number, stack: any, direction: 'top' | 'bottom') => {
     const safeStack = Array.isArray(stack) ? stack : [];
     const isHighlighted = highlightedTriangles.includes(index);
-    const triangleClasses = `triangle-${direction} m-1 ${isHighlighted ? 'bg-yellow-400' : ''}`;
+    const triangleClasses = `triangle-${direction} m-1 `;
 
     return (
       <div
         key={index}
-        className='w-2 cursor-pointer'
+        className={`flex justify-content-center w-2 cursor-pointer ${isHighlighted ? 'bg-yellow-400' : ''} ${selectedTriangle === index ? 'bg-green-400' : ''}`}
         onClick={() => handleTriangleClick(index)}
       >
         <div className={triangleClasses}></div>
-        <div className={direction === 'top' ? '' : 'pieces-container'}>
+        <div className={`${direction === 'top' ? '' : 'pieces-container'}`}>
+
           {safeStack.map((piece, i) => (
             <div
               key={i}
-              className={`piece ${piece === 'white' ? 'bg-white' : 'bg-black'} border border-gray-700`}
+              className={`piece ${piece === 'white' ? 'bg-white' : 'bg-black'} border border-gray-700 `}
             ></div>
           ))}
         </div>

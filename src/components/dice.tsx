@@ -11,16 +11,17 @@ interface DiceProps {
     dice2: number;
     setDice1: (value: number) => void;
     setDice2: (value: number) => void;
+    style: string;
 }
 
-const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2 }) => {
+const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, style }) => {
     const [dices1, setDices1] = useState<number[]>(Array(6).fill(0));
     const [dices2, setDices2] = useState<number[]>(Array(6).fill(0));
 
     const diceComponents = [Zar1, Zar2, Zar3, Zar4, Zar5, Zar6];
 
     return (
-        <div className="w-12 flex justify-content-center">
+        <div className={`w-12 flex justify-content-center ${style}`}>
             <div>
                 <div
                     className={`flex gap-4 p-4 ${dice1 ? 'bg-red-800' : 'bg-red-700'} m-1 border-round-xl shadow-3`}

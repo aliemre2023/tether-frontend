@@ -127,7 +127,15 @@ const Board: React.FC<BoardProps> = ({
         const isHighYellow = highlightedTriangles.includes(index);
 
         // same triangle clicked
-        if (selectedTriangle === index) {
+        console.log('INDEX in handleTriangleClick: ', index);
+        let tempIndex = index;
+        if (tempIndex <= 5) tempIndex = 5 - tempIndex;
+        if (tempIndex > 5 && tempIndex <= 11) tempIndex = 11 - tempIndex + 6;
+        if (board[tempIndex].length > 1 && board[tempIndex][0] != currentPlayer) {
+            return;
+        } else if (!isHighYellow && board[tempIndex].length == 0) {
+            return;
+        } else if (selectedTriangle === index) {
             setSelectedTriangle(null);
             setHighlightedTriangles([]);
             return;

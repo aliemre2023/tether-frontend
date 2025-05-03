@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
 interface BoardProps {
-    dice1: number | null;
-    dice2: number | null;
+    diceTop1: number | null;
+    diceTop2: number | null;
+    diceBottom1: number | null;
+    diceBottom2: number | null;
 }
 
-const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
+const Board: React.FC<BoardProps> = ({ diceTop1, diceTop2, diceBottom1, diceBottom2 }) => {
+    const [currentPlayer, setCurrentPlayer] = useState<string>('white');
     const [board, setBoard] = useState<string[][]>([]);
     const [highlightedTriangles, setHighlightedTriangles] = useState<number[]>([]);
     const [selectedTriangle, setSelectedTriangle] = useState<number | null>(null);
@@ -23,10 +26,15 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
 
     // Refetch moves when dice values change
     useEffect(() => {
-        if (selectedTriangle !== null && dice1 !== null && dice2 !== null) {
-            fetchMoves(selectedTriangle, dice1, dice2);
+        if (selectedTriangle !== null) {
+            const d1 = currentPlayer === 'white' ? diceTop1 : diceBottom1;
+            const d2 = currentPlayer === 'white' ? diceTop2 : diceBottom2;
+
+            if (d1 !== null && d2 !== null) {
+                fetchMoves(selectedTriangle, d1, d2);
+            }
         }
-    }, [dice1, dice2]);
+    }, [selectedTriangle, diceTop1, diceTop2, diceBottom1, diceBottom2, currentPlayer]);
 
     const fetchMoves = (index: number, d1: number, d2: number) => {
         fetch('http://127.0.0.1:5000/api/move', {
@@ -60,6 +68,9 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
     };
 
     const handleTriangleClick = (index: number) => {
+        const dice1 = currentPlayer === 'white' ? diceTop1 : diceBottom1;
+        const dice2 = currentPlayer === 'white' ? diceTop2 : diceBottom2;
+
         if (dice1 == null || dice2 == null) {
             console.warn('Dice values are not set');
             return;
@@ -67,11 +78,12 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
 
         const isHighYellow = highlightedTriangles.includes(index);
 
+        // same triangle clicked
         if (selectedTriangle === index) {
             setSelectedTriangle(null);
             setHighlightedTriangles([]);
             return;
-        } else if (isHighYellow) {
+        } else if (isHighYellow && selectedTriangle !== null) {
             const clickedYellow = highlightedTriangles.includes(index);
 
             fetch('http://127.0.0.1:5000/api/moveTo', {
@@ -91,6 +103,8 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
 
                     // Only reload board after move is complete
                     reloadBoard();
+
+                    setCurrentPlayer((prev) => (prev === 'white' ? 'black' : 'white'));
                 })
                 .catch((err) => console.error('Error moving piece:', err));
         } else {
@@ -115,7 +129,7 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
                     {safeStack.map((piece, i) => (
                         <div
                             key={i}
-                            className={`piece ${piece === 'white' ? 'bg-white' : 'bg-black'} border border-gray-700 `}
+                            className={`piece ${piece === 'white' ? 'bg-white' : 'bg-black'} border-3 border-gray-700 m-1 w-3rem h-3rem`}
                         ></div>
                     ))}
                 </div>
@@ -130,6 +144,10 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
 
     return (
         <div className="w-135rem h-auto">
+            <div className="text-center text-lg font-bold mt-2">
+                Current Turn:{' '}
+                <span className={currentPlayer === 'white' ? 'text-white' : 'text-black'}>{currentPlayer}</span>
+            </div>
             <div className="bg-red-700 flex p-4 border-round-xl">
                 <div className="w-6 bg-red-400 mr-1">
                     <div className="flex bg-green-100 h-18rem">
@@ -153,14 +171,14 @@ const Board: React.FC<BoardProps> = ({ dice1, dice2 }) => {
                 {/* White broken pieces container */}
                 <div className=" w-6 flex bg-red-700 p-1 mt-1 border-round-md mr-1">
                     {Array.from({ length: brokenPiece[0] }).map((_, i) => (
-                        <div key={`white-${i}`} className="piece bg-white border border-gray-700 m-1"></div>
+                        <div key={`white-${i}`} className="piece bg-white border-2 border-gray-700 m-1"></div>
                     ))}
                 </div>
 
                 {/* Black broken pieces container */}
                 <div className="pieces-container w-6 flex bg-red-700 p-1 mt-1 border-round-md justify-end ml-1">
                     {Array.from({ length: brokenPiece[1] }).map((_, i) => (
-                        <div key={`black-${i}`} className="piece bg-black border border-gray-700 m-1"></div>
+                        <div key={`black-${i}`} className="piece bg-black border-2 border-gray-700 m-1"></div>
                     ))}
                 </div>
             </div>

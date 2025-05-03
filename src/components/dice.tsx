@@ -24,7 +24,7 @@ const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, style }) 
         <div className={`w-12 flex justify-content-center ${style}`}>
             <div>
                 <div
-                    className={`flex gap-4 p-4 ${dice1 ? 'bg-red-800' : 'bg-red-700'} m-1 border-round-xl shadow-3`}
+                    className={`flex gap-4 p-2 ${dice1 ? 'bg-red-800' : 'bg-red-700'} m-1 border-round-xl shadow-3`}
                     style={{ width: 'max-content' }}
                 >
                     {diceComponents.map((ZarComponent, index) => (
@@ -42,7 +42,7 @@ const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, style }) 
                 </div>
 
                 <div
-                    className={`flex gap-4 p-4 ${dice2 ? 'bg-red-800' : 'bg-red-700'} m-1 border-round-xl shadow-3`}
+                    className={`flex gap-4 p-2 ${dice2 ? 'bg-red-800' : 'bg-red-700'} m-1 border-round-xl shadow-3`}
                     style={{ width: 'max-content' }}
                 >
                     {diceComponents.map((ZarComponent, index) => (

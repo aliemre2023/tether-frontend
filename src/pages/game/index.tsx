@@ -17,12 +17,12 @@ const Game = () => {
         <div className="flex w-12 h-screen justify-content-center align-items-center bg-blue-300">
             <Market></Market>
 
-            <Board dice1={topDice1} dice2={topDice2} />
+            <Board diceTop1={topDice1} diceTop2={topDice2} diceBottom1={bottomDice1} diceBottom2={bottomDice2} />
 
             <div className="flex h-screen flex-col justify-between align-items-center">
                 <div>
                     <div id="enemy">
-                        <Wallet />
+                        <Wallet background_color="bg-gray-100" border_color="border-gray-600" />
                         <Dice
                             dice1={topDice1}
                             dice2={topDice2}
@@ -46,7 +46,7 @@ const Game = () => {
                             setDice2={setBottomDice2}
                             style={'bottom-auto'}
                         />
-                        <Wallet />
+                        <Wallet background_color="bg-green-200" border_color="border-green-700" />
                     </div>
                 </div>
             </div>

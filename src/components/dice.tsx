@@ -7,6 +7,8 @@ import Zar5 from './dices/zar5';
 import Zar6 from './dices/zar6';
 
 interface DiceProps {
+    currentPlayer: 'white' | 'black';
+    owner: 'white' | 'black';
     dice1: number;
     dice2: number;
     setDice1: (value: number) => void;
@@ -16,7 +18,7 @@ interface DiceProps {
     style: string;
 }
 
-const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, availableDices1, availableDices2, style }) => {
+const Dice: React.FC<DiceProps> = ({ currentPlayer, owner, dice1, dice2, setDice1, setDice2, availableDices1, availableDices2, style }) => {
     const [dices1, setDices1] = useState<number[]>(Array(6).fill(0));
     const [dices2, setDices2] = useState<number[]>(Array(6).fill(0));
 
@@ -33,14 +35,14 @@ const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, available
                         <div
                             key={index}
                             onClick={() => {
-                                if (availableDices1[index]) {
+                                if (currentPlayer === owner && availableDices1[index]) {
                                     setDice1(dice1 === index + 1 ? 0 : index + 1);
                                 }
                             }}
                             className={`cursor-pointer ${dices1[index] ? 'bg-red-300' : 'bg-green-100'}`}
                         >
                             {' '}
-                            <ZarComponent isSelected={dice1 === index + 1} isAvailable={availableDices1[index]} />{' '}
+                            <ZarComponent isSelected={(dice1 === index + 1) && currentPlayer === owner} isAvailable={availableDices1[index]} />{' '}
                         </div>
                     ))}
                 </div>
@@ -53,14 +55,14 @@ const Dice: React.FC<DiceProps> = ({ dice1, dice2, setDice1, setDice2, available
                         <div
                             key={index}
                             onClick={() => {
-                                if (availableDices2[index]) {
+                                if (currentPlayer === owner && availableDices2[index]) {
                                     setDice2(dice2 === index + 1 ? 0 : index + 1);
                                 }
                             }}
                             className={`cursor-pointer ${dices2[index] ? 'bg-red-300' : 'bg-green-100'}`}
                         >
                             {' '}
-                            <ZarComponent isSelected={dice2 === index + 1} isAvailable={availableDices2[index]} />{' '}
+                            <ZarComponent isSelected={(dice2 === index + 1) && currentPlayer === owner} isAvailable={availableDices2[index]} />{' '}
                         </div>
                     ))}
                 </div>

@@ -8,6 +8,9 @@ import Wallet from '../../components/wallet';
 
 const Game = () => {
     const router = useRouter();
+
+    const [currentPlayer, setCurrentPlayer] = useState<'white' | 'black'>('white');
+
     const [topDice1, setTopDice1] = useState<number>(0);
     const [topDice2, setTopDice2] = useState<number>(0);
     const [bottomDice1, setBottomDice1] = useState<number>(0);
@@ -23,6 +26,8 @@ const Game = () => {
             <Market></Market>
 
             <Board
+                currentPlayer={currentPlayer}
+                setCurrentPlayer={setCurrentPlayer}
                 diceTop1={topDice1}
                 diceTop2={topDice2}
                 diceBottom1={bottomDice1}
@@ -46,6 +51,8 @@ const Game = () => {
                     <div id="enemy">
                         <Wallet background_color="bg-gray-100" border_color="border-gray-600" />
                         <Dice
+                            currentPlayer={currentPlayer}
+                            owner='white'
                             dice1={topDice1}
                             dice2={topDice2}
                             setDice1={setTopDice1}
@@ -64,6 +71,8 @@ const Game = () => {
                             <Storage />
                         </div>
                         <Dice
+                            currentPlayer={currentPlayer}
+                            owner='black'
                             dice1={bottomDice1}
                             dice2={bottomDice2}
                             setDice1={setBottomDice1}

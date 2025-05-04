@@ -1,11 +1,12 @@
-import { accumulateViewport } from 'next/dist/lib/metadata/resolve-metadata';
 import React, { useEffect, useState } from 'react';
 
 interface BoardProps {
-    diceTop1: number | null;
-    diceTop2: number | null;
-    diceBottom1: number | null;
-    diceBottom2: number | null;
+    currentPlayer: 'white' | 'black';
+    setCurrentPlayer: (value: 'white' | 'black') => void;
+    diceTop1: number | 0;
+    diceTop2: number | 0;
+    diceBottom1: number | 0;
+    diceBottom2: number | 0;
     setDiceTop1: (value: number) => void;
     setDiceTop2: (value: number) => void;
     setDiceBottom1: (value: number) => void;
@@ -21,6 +22,8 @@ interface BoardProps {
 }
 
 const Board: React.FC<BoardProps> = ({
+    currentPlayer,
+    setCurrentPlayer,
     diceTop1,
     diceTop2,
     diceBottom1,
@@ -38,7 +41,6 @@ const Board: React.FC<BoardProps> = ({
     setAvailableBottomDices1,
     setAvailableBottomDices2,
 }) => {
-    const [currentPlayer, setCurrentPlayer] = useState<string>('white');
     const [board, setBoard] = useState<string[][]>([]);
     const [highlightedTriangles, setHighlightedTriangles] = useState<number[]>([]);
     const [selectedTriangle, setSelectedTriangle] = useState<number | null>(null);
@@ -60,8 +62,11 @@ const Board: React.FC<BoardProps> = ({
             const d1 = currentPlayer === 'white' ? diceTop1 : diceBottom1;
             const d2 = currentPlayer === 'white' ? diceTop2 : diceBottom2;
 
-            if (d1 !== null && d2 !== null) {
+            if (d1 !== 0 && d2 !== 0) {
                 fetchMoves(selectedTriangle, d1, d2);
+            } else {
+                setSelectedTriangle(null);
+                setHighlightedTriangles([]);
             }
         }
     }, [selectedTriangle, diceTop1, diceTop2, diceBottom1, diceBottom2, currentPlayer]);
@@ -76,7 +81,6 @@ const Board: React.FC<BoardProps> = ({
             }
         }
         if (isDiceReload) {
-            console.log('eee aga reload atsana');
             setAvailableTopDices1(Array(6).fill(true));
             setAvailableTopDices2(Array(6).fill(true));
             setAvailableBottomDices1(Array(6).fill(true));
@@ -119,19 +123,19 @@ const Board: React.FC<BoardProps> = ({
         const dice1 = currentPlayer === 'white' ? diceTop1 : diceBottom1;
         const dice2 = currentPlayer === 'white' ? diceTop2 : diceBottom2;
 
-        if (dice1 == null || dice2 == null) {
+        if (dice1 === 0 || dice2 === 0) {
             console.warn('Dice values are not set');
             return;
         }
-
         const isHighYellow = highlightedTriangles.includes(index);
 
-        // same triangle clicked
-        console.log('INDEX in handleTriangleClick: ', index);
         let tempIndex = index;
         if (tempIndex <= 5) tempIndex = 5 - tempIndex;
         if (tempIndex > 5 && tempIndex <= 11) tempIndex = 11 - tempIndex + 6;
-        if (board[tempIndex].length > 1 && board[tempIndex][0] != currentPlayer) {
+
+        if (!isHighYellow && board[tempIndex].length >= 1 && board[tempIndex][0] != currentPlayer) {
+            return;
+        } else if (isHighYellow && board[tempIndex].length > 1 && board[tempIndex][0] != currentPlayer) {
             return;
         } else if (!isHighYellow && board[tempIndex].length == 0) {
             return;
@@ -140,27 +144,19 @@ const Board: React.FC<BoardProps> = ({
             setHighlightedTriangles([]);
             return;
         } else if (isHighYellow && selectedTriangle !== null) {
-            const clickedYellow = highlightedTriangles.includes(index);
-
             fetch('http://127.0.0.1:5000/api/moveTo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ index_from: selectedTriangle, index_to: index }),
             })
                 .then((res) => res.json())
-                .then((data) => {
-                    const transformedMoves = (data.moves || []).map((triangleId: number) => {
-                        if (triangleId <= 5) return 5 - triangleId;
-                        if (triangleId > 5 && triangleId <= 11) return 11 - triangleId + 6;
-                        return triangleId;
-                    });
-
+                .then(() => {
                     if (currentPlayer == 'white') {
                         setDiceTop1(0);
                         setDiceTop2(0);
                         setAvailableTopDices1(
                             availableTopDices1.map((dice, index) => {
-                                if (index == dice1 - 1) {
+                                if (index === dice1 - 1) {
                                     return false;
                                 }
                                 return dice;
@@ -168,7 +164,7 @@ const Board: React.FC<BoardProps> = ({
                         );
                         setAvailableTopDices2(
                             availableTopDices2.map((dice, index) => {
-                                if (index == dice2 - 1) {
+                                if (index === dice2 - 1) {
                                     return false;
                                 }
                                 return dice;
@@ -179,7 +175,7 @@ const Board: React.FC<BoardProps> = ({
                         setDiceBottom2(0);
                         setAvailableBottomDices1(
                             availableBottomDices1.map((dice, index) => {
-                                if (index == dice1 - 1) {
+                                if (index === dice1 - 1) {
                                     return false;
                                 }
                                 return dice;
@@ -198,10 +194,9 @@ const Board: React.FC<BoardProps> = ({
                     setHighlightedTriangles([]);
                     setSelectedTriangle(null);
 
-                    // Only reload board after move is complete
                     reloadBoard();
 
-                    setCurrentPlayer((prev) => (prev === 'white' ? 'black' : 'white'));
+                    setCurrentPlayer(currentPlayer === 'white' ? 'black' : 'white');
                 })
                 .catch((err) => console.error('Error moving piece:', err));
         } else {

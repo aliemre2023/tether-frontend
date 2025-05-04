@@ -53,7 +53,7 @@ const Board: React.FC<BoardProps> = ({
 
     // Reset board on mount
     useEffect(() => {
-        fetch('http://127.0.0.1:5000/api/reset')
+        fetch('https://tether-backend.vercel.app/api/reset')
             .then((res) => res.json())
             .then((data) => {
                 setBoard(data.board || []);
@@ -96,7 +96,7 @@ const Board: React.FC<BoardProps> = ({
     }, [availableTopDices1, availableBottomDices1]);
 
     const fetchMoves = (index: number, d1: number, d2: number) => {
-        fetch('http://127.0.0.1:5000/api/move', {
+        fetch('https://tether-backend.vercel.app/api/move', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ index, dice1: d1, dice2: d2 }),
@@ -114,7 +114,7 @@ const Board: React.FC<BoardProps> = ({
     };
 
     const fetchSaveMoves = (index: number, dice1: number, dice2: number) => {
-        fetch('http://127.0.0.1:5000/api/piece/save', {
+        fetch('https://tether-backend.vercel.app/api/piece/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ index, dice1, dice2 }),
@@ -136,7 +136,7 @@ const Board: React.FC<BoardProps> = ({
     };
 
     const reloadBoard = () => {
-        fetch('http://127.0.0.1:5000/api/board/reload')
+        fetch('https://tether-backend.vercel.app/api/board/reload')
             .then((res) => res.json())
             .then((boardData) => {
                 // Set the new board state here
@@ -182,7 +182,7 @@ const Board: React.FC<BoardProps> = ({
             setHighlightedTriangles([]);
             return;
         } else if (isHighYellow && selectedTriangle !== null) {
-            fetch('http://127.0.0.1:5000/api/moveTo', {
+            fetch('https://tether-backend.vercel.app/api/moveTo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ index_from: selectedTriangle, index_to: index }),
@@ -251,7 +251,9 @@ const Board: React.FC<BoardProps> = ({
         return (
             <div
                 key={index}
-                className={`flex justify-content-center w-2 cursor-pointer ${isHighlighted ? 'bg-yellow-400' : ''} ${selectedTriangle === index ? 'bg-green-400' : ''} ${direction === 'top' ? '' : 'align-items-end'}`}
+                className={`flex justify-content-center w-2 cursor-pointer ${isHighlighted ? 'bg-yellow-400' : ''} ${
+                    selectedTriangle === index ? 'bg-green-400' : ''
+                } ${direction === 'top' ? '' : 'align-items-end'}`}
                 onClick={() => handleTriangleClick(index)}
             >
                 <div className={triangleClasses}></div>
@@ -259,7 +261,9 @@ const Board: React.FC<BoardProps> = ({
                     {safeStack.map((piece, i) => (
                         <div
                             key={i}
-                            className={`piece ${piece === 'white' ? 'bg-white' : 'bg-black'} border-3 border-gray-700 m-1 w-3rem h-3rem`}
+                            className={`piece ${
+                                piece === 'white' ? 'bg-white' : 'bg-black'
+                            } border-3 border-gray-700 m-1 w-3rem h-3rem`}
                         ></div>
                     ))}
                 </div>

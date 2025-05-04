@@ -46,6 +46,11 @@ const Board: React.FC<BoardProps> = ({
     const [selectedTriangle, setSelectedTriangle] = useState<number | null>(null);
     const [brokenPiece, setBrokenPiece] = useState<number[]>([0, 0]); // white, black
 
+    const rightBottom = board.slice(0, 6).reverse();
+    const leftBottom = board.slice(6, 12).reverse();
+    const leftTop = board.slice(12, 18);
+    const rightTop = board.slice(18, 24);
+
     // Reset board on mount
     useEffect(() => {
         fetch('http://127.0.0.1:5000/api/reset')
@@ -62,8 +67,10 @@ const Board: React.FC<BoardProps> = ({
             const d1 = currentPlayer === 'white' ? diceTop1 : diceBottom1;
             const d2 = currentPlayer === 'white' ? diceTop2 : diceBottom2;
 
-            if (d1 !== 0 && d2 !== 0) {
+            if (d1 !== 0 && d2 !== 0 && !(selectedTriangle == 101 || selectedTriangle == 102)) {
                 fetchMoves(selectedTriangle, d1, d2);
+            } else if (d1 !== 0 && d2 !== 0 && (selectedTriangle == 101 || selectedTriangle == 102)) {
+                fetchSaveMoves(selectedTriangle, d1, d2);
             } else {
                 setSelectedTriangle(null);
                 setHighlightedTriangles([]);
@@ -106,6 +113,28 @@ const Board: React.FC<BoardProps> = ({
             .catch((err) => console.error('Error getting possible moves:', err));
     };
 
+    const fetchSaveMoves = (index: number, dice1: number, dice2: number) => {
+        fetch('http://127.0.0.1:5000/api/piece/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ index, dice1, dice2 }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const transformedMoves = (data.highlightedPlaces || []).map((triangleId: number) => {
+                    if (triangleId <= 5) return 5 - triangleId;
+                    if (triangleId > 5 && triangleId <= 11) return 11 - triangleId + 6;
+                    return triangleId;
+                });
+                console.log('Highlighting:', transformedMoves);
+                setHighlightedTriangles(transformedMoves);
+                console.log('Broken stone triangles shown');
+                console.log('higlted tri:', transformedMoves);
+                reloadBoard();
+            })
+            .catch((err) => console.error('Error getting possible moves:', err));
+    };
+
     const reloadBoard = () => {
         fetch('http://127.0.0.1:5000/api/board/reload')
             .then((res) => res.json())
@@ -133,7 +162,16 @@ const Board: React.FC<BoardProps> = ({
         if (tempIndex <= 5) tempIndex = 5 - tempIndex;
         if (tempIndex > 5 && tempIndex <= 11) tempIndex = 11 - tempIndex + 6;
 
-        if (!isHighYellow && board[tempIndex].length >= 1 && board[tempIndex][0] != currentPlayer) {
+        // Handle broken pieces
+        if (index == 101 || index == 102) {
+            if (brokenPiece[0] > 0 && currentPlayer === 'white' && index === 101) {
+                setSelectedTriangle(101);
+                fetchSaveMoves(101, dice1, dice2);
+            } else if (brokenPiece[1] > 0 && currentPlayer === 'black' && index === 102) {
+                setSelectedTriangle(102);
+                fetchSaveMoves(102, dice1, dice2);
+            }
+        } else if (!isHighYellow && board[tempIndex].length >= 1 && board[tempIndex][0] != currentPlayer) {
             return;
         } else if (isHighYellow && board[tempIndex].length > 1 && board[tempIndex][0] != currentPlayer) {
             return;
@@ -229,11 +267,6 @@ const Board: React.FC<BoardProps> = ({
         );
     };
 
-    const rightBottom = board.slice(0, 6).reverse();
-    const leftBottom = board.slice(6, 12).reverse();
-    const leftTop = board.slice(12, 18);
-    const rightTop = board.slice(18, 24);
-
     return (
         <div className="w-135rem h-auto">
             <div className="text-center text-lg font-bold mt-2">
@@ -261,14 +294,26 @@ const Board: React.FC<BoardProps> = ({
             </div>
             <div className="flex w-12">
                 {/* White broken pieces container */}
-                <div className=" w-6 flex bg-red-700 p-1 mt-1 border-round-md mr-1">
+                <div
+                    key={101}
+                    className={`w-6 flex p-1 mt-1 border-round-md mr-1 cursor-pointer ${
+                        selectedTriangle === 101 || highlightedTriangles.includes(101) ? 'bg-yellow-400' : 'bg-red-700'
+                    }`}
+                    onClick={() => handleTriangleClick(101)}
+                >
                     {Array.from({ length: brokenPiece[0] }).map((_, i) => (
                         <div key={`white-${i}`} className="piece bg-white border-2 border-gray-700 m-1"></div>
                     ))}
                 </div>
 
                 {/* Black broken pieces container */}
-                <div className="pieces-container w-6 flex bg-red-700 p-1 mt-1 border-round-md justify-end ml-1">
+                <div
+                    key={102}
+                    className={`w-6 flex p-1 mt-1 border-round-md justify-end ml-1 cursor-pointer ${
+                        selectedTriangle === 102 || highlightedTriangles.includes(102) ? 'bg-yellow-400' : 'bg-red-700'
+                    }`}
+                    onClick={() => handleTriangleClick(102)}
+                >
                     {Array.from({ length: brokenPiece[1] }).map((_, i) => (
                         <div key={`black-${i}`} className="piece bg-black border-2 border-gray-700 m-1"></div>
                     ))}

@@ -5,8 +5,8 @@ const Market: React.FC = () => {
     const items = [
         { text: '1', img: '/pieces/piece1.png' },
         { text: '2', img: '/pieces/piece2.png' },
-        { text: '3', img: '/pieces/piece3.png' },
-        { text: '4', img: '/pieces/piece4.png' },
+        { text: '3', img: '/triangle/triangle2.jpg' },
+        { text: '4', img: '/triangle/triangle1.png' },
     ];
 
     return (
